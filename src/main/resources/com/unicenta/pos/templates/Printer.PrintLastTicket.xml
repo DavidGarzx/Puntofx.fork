@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+ 
+ -->
+
+<output>
+
+    <display>
+        <line><text align="left" length="8">Total</text><text align="right" length="12">${ticket.printTotal()}</text></line>
+        <line><text align="center" length="20">¡Gracias!</text></line>
+    </display>
+
+    <ticket>
+        <image>Printer.Ticket.Logo</image>
+        <line>
+        </line>
+        <!-- Estas líneas jalan la info del encabezado que configures en el sistema -->
+        #if (${ticket.printTicketHeaderLine1()} != "")
+            <line><text align="center" length="42">${ticket.printTicketHeaderLine1()}</text></line>
+        #end
+        #if (${ticket.printTicketHeaderLine2()} != "")
+            <line><text align="center" length="42">${ticket.printTicketHeaderLine2()}</text></line>
+        #end
+        #if (${ticket.printTicketHeaderLine3()} != "")
+            <line><text align="center" length="42">${ticket.printTicketHeaderLine3()}</text></line>
+        #end
+        #if (${ticket.printTicketHeaderLine4()} != "")
+            <line><text align="center" length="42">${ticket.printTicketHeaderLine4()}</text></line>
+        #end
+        #if (${ticket.printTicketHeaderLine5()} != "")
+            <line><text align="center" length="42">${ticket.printTicketHeaderLine5()}</text></line>
+        #end
+        #if (${ticket.printTicketHeaderLine6()} != "")
+            <line><text align="center" length="42">${ticket.printTicketHeaderLine6()}</text></line>
+        #end
+
+        <!-- El texto "Printer.PrintLastTicket" se ve feo, lo quité. Esto se ve más limpio. -->
+        <line></line> 
+        #if (${ticket.ticketType} == 0)
+            <line>
+                <text align="left" length="15">Ticket:</text>
+                <text>${ticket.printId()}</text>
+            </line>
+        #end
+        #if (${ticket.ticketType} == 1)
+            <line>
+                <text align="left" length="15">Devolución:</text>
+                <text>${ticket.printId()}</text>
+            </line>
+        #end
+	
+        <line>
+            <text align="left" length="15">Fecha:</text>
+            <text>${ticket.printDate()}</text>
+        </line>
+        <line>
+            <text align="left" length="15">Caja: </text>
+            <text>${ticket.getHost()}</text>
+        </line> 
+        <line>
+            <text align="left" length="15">Le atendió:</text>
+            <text>${ticket.printUser()}</text>
+        </line>
+
+        #if ($ticket.getCustomer())
+            <line>
+                <text align="left" length="15">No. de Cliente:</text>
+                <text>${ticket.getCustomer().printTaxCustomerID()}</text>
+            </line>
+            <line>
+                <text align="left" length="15">Cliente:</text>
+                <text>${ticket.getCustomer().printName()}</text>
+            </line>
+            <line>
+                <text align="left" length="15">Dirección:</text>
+                <text>${ticket.getCustomer().printAddress()}</text>
+            </line>
+            <line>
+                <text align="left" length="15">C.P.:</text>
+                <text>${ticket.getCustomer().printPostal()}</text>
+            </line>
+            <line>
+                <text align="left" length="15">Teléfono:</text>
+                <text>${ticket.getCustomer().printPhone()}</text>
+            </line>
+            <line>
+                <text align="left" length="15">Saldo Pendiente:</text>
+                <text>${ticket.getCustomer().printCurDebt()}</text>
+            </line>
+        #end     
+
+        #if (${tickettext.place} != ${place})
+            <line>
+                <text align="left" length="15">Mesa:</text>
+                <text>${place}</text>
+            </line>
+	#end
+	<line></line>
+
+        <line>
+            <text align ="left" length="17">Artículo</text>
+            <text align ="right" length="8">Precio</text>
+            <text align ="right" length="7">Cant.</text>
+            <text align ="right" length="10">Importe</text>
+        </line>
+        <line>
+            <text align="left" length="42">------------------------------------------</text>
+        </line>
+    
+        #foreach ($ticketline in $ticket.getLines())
+        <line>
+            #if ($ticketline.isProductCom())
+                <text align ="left" length="17">*${ticketline.printName()}</text>
+            #else
+                <text align ="left" length="17">${ticketline.printName()}</text>
+            #end
+
+            <!-- Opción 1: Muestra precios CON impuestos (más común en México) -->
+            <text align ="right" length="8">${ticketline.printPriceTax()}</text>
+            <text align ="right" length="7">x${ticketline.printMultiply()}</text>
+            <text align ="right" length="10">${ticketline.printValue()}</text>
+         </line>
+
+            <!-- Opción 2: Muestra precios SIN impuestos (descomenta si lo necesitas) -->
+            <!--
+            <text align ="right" length="8">${ticketline.printPrice()}</text>
+            <text align ="right" length="7">x${ticketline.printMultiply()}</text>
+            <text align ="right" length="8">${ticketline.printSubValue()}</text>
+            </line>
+            -->
+        
+            <!-- EXTRAS DEL PRODUCTO (Descomenta las que necesites) -->
+            <!-- <line><text align ="left" length="42">Ingredientes: ${ticketline.getProperty("ingredients", "")}</text> </line> -->
+            <!-- <line><text align ="left" length="42">Notas: ${ticketline.getProperty("notes", "")}</text> </line> --> 
+            <!-- <line><text align ="left" length="42">Código: ${ticketline.printCode()}</text></line> -->
+            
+            #if ($ticketline.productAttSetInstId)
+                <line>
+                    <text align ="left" length="42">${ticketline.productAttSetInstDesc}</text>
+                </line>
+            #end
+        #end
+
+        <line><text align="left" length="42">------------------------------------------</text></line>
+        <line><text>No. de Artículos: </text><text align ="left" length="14">${ticket.printArticlesCount()}</text></line>
+        <line></line>
+        <line><text align ="left" bold="true" length="16">Subtotal</text><text align ="right" length="26">${ticket.printSubTotal()}</text></line>
+        <line><text align ="left" length="16">Impuestos</text><text align ="right" length="26">${ticket.printTax()}</text></line>
+        <line></line>
+        <line size="1"><text align ="left" length="16" bold="true">TOTAL</text><text align ="right" length="26" bold="true">${ticket.printTotal()}</text></line>
+        <line></line>
+
+        #foreach ($taxinfo in $taxes)
+        <line>
+            <text align ="left" length="18">${taxline.getTaxInfo()}</text>
+            <text align ="right" length="12">${taxline.printSubTotal()}</text>
+            <text align ="right" length="12">${taxline.printTax()}</text>
+        </line>
+        #end
+        <line></line>
+
+        #foreach ($paymentline in $ticket.payments)
+            #if ($paymentline.name == "cash")
+                <line><text bold="true">Efectivo</text></line>
+                <line>
+                    <text align="left" length="22">Recibido:</text>
+                    <text align ="right" length="20">${paymentline.printPaid()}</text>
+                </line>
+                <line>
+                    <text align="left" length="22">Cambio:</text>
+                    <text align ="right" length="20">${paymentline.printChange()}</text>
+                </line>
+            #end
+            #if ($paymentline.name == "cashrefund")
+                <line>
+                    <text align="left" length="22" bold="true">Devolución en Efectivo</text>
+                    <text align ="right" length="20">${paymentline.printTotal()}</text>
+                </line>
+            #end
+            #if ($paymentline.name == "cheque")
+                <line>
+                    <text align="left" length="22" bold="true">Cheque</text>
+                    <text align ="right" length="20">${paymentline.printTotal()}</text>
+                </line>
+            #end
+            #if ($paymentline.name == "chequerefund")
+                <line>
+                    <text align="left" length="22" bold="true">Devolución en Cheque</text>
+                    <text align ="right" length="20">${paymentline.printTotal()}</text>                
+                </line>
+            #end
+            #if ($paymentline.name == "voucherin")
+                <line>
+                    <text align="left" length="22" bold="true">Vale</text>
+                    <text align ="right" length="20">${paymentline.printTotal()}</text>
+                </line>
+            #end
+            #if ($paymentline.name == "voucherout")
+                <line>
+                    <text align="left" length="22" bold="true">Nota de Crédito</text>
+                    <text align ="right" length="20">${paymentline.printTotal()}</text>
+                </line>
+            #end
+            #if ($paymentline.name == "free")
+                <line>
+                    <text align="left" length="22" bold="true">Cortesía</text>
+                    <text align ="right" length="20">${paymentline.printTotal()}</text>
+                </line>
+            #end
+            #if ($paymentline.name == "debt")
+                <line>
+                    <text align="left" length="22" bold="true">A Crédito</text>
+                    <text align ="right" length="20">${paymentline.printTotal()}</text>
+                </line>
+            #end
+        #end
+
+        #if (${ticket.printTicketFooterLine1()} != "")
+            <line></line>
+        <line>
+            <text align="center" length="42">${ticket.printTicketFooterLine1()}</text>
+        </line>  
+        <line><text>==========================================</text></line>
+        #end
+        #if (${ticket.printTicketFooterLine2()} != "")
+            <line><text>${ticket.printTicketFooterLine2()}</text></line>
+        #end
+        #if (${ticket.printTicketFooterLine3()} != "")
+            <line><text>${ticket.printTicketFooterLine3()}</text></line>
+        #end
+        #if (${ticket.printTicketFooterLine4()} != "")
+            <line><text>${ticket.printTicketFooterLine4()}</text></line>
+        #end
+        #if (${ticket.printTicketFooterLine5()} != "")
+            <line><text>${ticket.printTicketFooterLine5()}</text></line>
+        #end
+        #if (${ticket.printTicketFooterLine6()} != "")
+            <line><text>${ticket.printTicketFooterLine6()}</text></line>
+        #end
+        <line></line>
+
+        #foreach ($paymentline in $ticket.payments)
+            #if ($paymentline.name == "ccard")
+                <line size="1">
+                    <text align="center" length="42" bold="true">-- PAGO CON TARJETA --</text>
+                </line>
+                <line size="1"><text>${paymentline.getCardName()}</text></line>
+                <line><text>${paymentline.printCardNumber()}</text></line>
+                <line></line>
+                <line size="1">
+                    <text align="left" length="10">MONTO:</text>
+                    <text align ="right" length="32">${paymentline.printTotal()}</text>
+                </line>
+                <line><text>ID Transacción: </text><text>${paymentline.printTransactionID()}</text></line>
+                <line><text>Cód. Autorización: </text><text>${paymentline.printAuthorization()}</text></line>
+                #if ($paymentline.chipAndPin)
+                    <line><text>Verificado por: </text><text>${paymentline.printVerification()}</text></line>
+                #end
+
+                #if ($ticket.hasTip())
+                    <line></line>
+                    <line><text align ="left" length="16">Propina:</text><text align ="right" length="26">_______________</text></line>
+                    <line></line>
+                    <line size="1"><text align ="left" length="16" bold="false">Total:</text><text align ="right" length="26" bold="false">_______________</text></line>
+                    <line></line><line></line>
+                    <line size="1"><text align ="center" length="42" bold="false">__________________</text></line>
+                    <line size="1"><text align ="center" length="42" bold="false">Firma</text></line>
+                #end            
+            #end
+            #if ($paymentline.name == "ccardrefund")
+                <line size="1"><text align="center" length="42" bold="true">-- DEVOLUCIÓN A TARJETA --</text></line>
+                <line size="1"><text>${paymentline.getCardName()}</text></line>    
+                <line><text>${paymentline.printCardNumber()}</text></line>
+                <line></line>
+                <line size="1"><text align="left" length="10">MONTO:</text><text align ="right" length="32">${paymentline.printTotal()}</text></line>
+                <line><text>ID Transacción: </text><text>${paymentline.printTransactionID()}</text></line>
+                <line><text>Cód. Autorización: </text><text>${paymentline.printAuthorization()}</text></line>
+                <line></line>                
+            #end
+        #end
+    </ticket>
+
+    #foreach ($paymentline in $ticket.payments)
+        #if ($paymentline.name == "cash" || $paymentline.name == "cashrefund")
+            <opendrawer/>
+        #end
+    #end
+
+</output>

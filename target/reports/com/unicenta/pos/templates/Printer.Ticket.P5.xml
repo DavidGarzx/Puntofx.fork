@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  
+-->
+
+<output>
+    <display>
+        <line>
+            <text align="left" length="10">Orden a Imp. 5</text>
+            <text align="right" length="10">${ticket.printTotal()}</text>
+        </line>
+        <line>
+            <text align="center" length="20">Gracias.</text>
+        </line>
+    </display>
+
+    <ticket printer="5">
+        <line></line>
+        <line></line>
+        <line size = "1"><text bold = "true" align="center" length="42">Impresora 5</text></line>
+        <line></line>
+        <line size = "1"><text>Orden: </text><text bold = "true">${ticket.getPickupId()}</text></line>
+
+        <line><text align="left" length="15">Fecha:</text><text>${ticket.printDate()}</text></line>
+        <line><text align="left" length="15">Terminal: </text><text>${ticket.getHost()}</text></line> 
+        <line><text align="left" length="15">Mesero:</text><text>${ticket.printUser()}</text></line>
+
+        #if ($ticket.getCustomer())
+            <line><text align="left" length="15">Cliente:</text><text>${ticket.getCustomer().getName()}</text></line>
+            <line><text align="left" length="15">No. de Cuenta:</text><text>${ticket.getCustomer().getTaxid()}</text></line>
+        #end
+
+        #if (${tickettext.place} != ${place})
+            <line><text align="left" length="15">Mesa:</text><text>${place}</text></line>
+        #end
+        
+        <line></line>
+        <line><text align ="left" length="17">Artículo</text><text align ="right" length="5"></text></line>
+        <line><text>------------------------------------------</text></line>
+
+        #foreach ($ticketline in $ticket.getLines())
+            #if($ticketline.printPrinter().equals("5"))
+                #if($ticketline.getProperty("ticket.updated").equals("true"))
+                    #if ($ticketline.isProductCom())
+                        <line size="1"><text align ="left" length="37">--${ticketline.printName()}</text></line>
+                    #else
+                        <line size="1">
+                        <text align ="left" length="5"> ${ticketline.printMultiply()}x</text>
+                        <text align ="left" length="37"> ${ticketline.printName()}</text>
+                        </line>
+                    #end
+
+                    #if ($ticketline.productAttSetInstId)
+                        <line><text align ="left" bold="true" length="42">   ${ticketline.productAttSetInstDesc}</text></line>
+                        <line></line>
+                    #end
+                    ${ticketline.setProperty("ticket.updated", "false")}
+                #end
+            #end
+        #end
+    </ticket>
+</output>
